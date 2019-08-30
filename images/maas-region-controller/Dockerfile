@@ -11,6 +11,17 @@ LABEL org.opencontainers.image.licenses='Apache-2.0'
 ENV DEBIAN_FRONTEND noninteractive
 ENV container docker
 
+# everything else below is to setup maas into the systemd initialized
+# container based on ubuntu 18.04
+RUN apt-get -qq update && \
+    apt-get -y install \
+    sudo \
+    software-properties-common \
+    libvirt-bin \
+    systemd \
+    patch \
+    jq
+
 # Don't start any optional services except for the few we need.
 RUN find /etc/systemd/system \
          /lib/systemd/system \
