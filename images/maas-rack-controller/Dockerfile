@@ -39,6 +39,7 @@ RUN systemctl enable rsyslog.service
 ENV MAAS_VERSION 2.6.0-7802-g59416a869-0ubuntu1~18.04.1
 
 # install maas
+RUN add-apt-repository ppa:maas/stable -y && apt-get update
 RUN rsyslogd; apt-get install -y maas-cli=$MAAS_VERSION maas-rack-controller=$MAAS_VERSION
 
 RUN mv /usr/sbin/tcpdump /usr/bin/tcpdump
