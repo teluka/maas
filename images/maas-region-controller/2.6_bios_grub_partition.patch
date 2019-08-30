@@ -1,0 +1,12 @@
+203c203,204
+< 
+---
+>         # Circular imports.
+>         from maasserver.models.partitiontable import GPT_REQUIRED_SIZE
+233c234,237
+<             elif arch == "amd64" and bios_boot_method != "uefi":
+---
+>             elif (arch == "amd64" and
+>                     self.partition_table.block_device.id == boot_disk.id and
+>                     bios_boot_method != "uefi" and
+>                     boot_disk.size >= GPT_REQUIRED_SIZE):

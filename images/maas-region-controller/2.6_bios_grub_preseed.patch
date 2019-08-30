@@ -1,0 +1,9 @@
+24a25
+>     GPT_REQUIRED_SIZE,
+134c135,138
+<         return arch == "amd64" and bios_boot_method != "uefi"
+---
+>         return (
+>                 arch == "amd64" and
+>                 bios_boot_method != "uefi" and
+>                 block_device.size >= GPT_REQUIRED_SIZE)
