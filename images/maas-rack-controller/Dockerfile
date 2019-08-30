@@ -1,4 +1,4 @@
-ARG FROM=ubuntu:16.04
+ARG FROM=ubuntu:18.04
 FROM ${FROM}
 
 LABEL org.opencontainers.image.authors='airship-discuss@lists.airshipit.org, irc://#airshipit@freenode'
@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV container docker
 
 # everything else below is to setup maas into the systemd initialized
-# container based on ubuntu 16.04
+# container based on ubuntu 18.04
 RUN apt-get -qq update && \
     apt-get -y install \
     sudo \
@@ -36,7 +36,7 @@ RUN systemctl set-default multi-user.target
 RUN apt-get install -y rsyslog
 RUN systemctl enable rsyslog.service
 
-ENV MAAS_VERSION 2.3.5-6511-gf466fdb-0ubuntu1
+ENV MAAS_VERSION 2.6.0-7802-g59416a869-0ubuntu1~18.04.1
 
 # install maas
 RUN rsyslogd; apt-get install -y maas-cli=$MAAS_VERSION maas-rack-controller=$MAAS_VERSION
@@ -50,15 +50,17 @@ RUN systemctl enable register-rack-controller.service
 
 # Patch so that Calico interfaces are ignored
 # dc6350: this appears to be fixed in maas master as of 10/4/2018, but that change is not in 2.3.5
-COPY 2.3_nic_filter.patch /tmp/2.3_nic_filter.patch
+##COPY 2.3_nic_filter.patch /tmp/2.3_nic_filter.patch
 # sh8121att: patch so that interfaces with MAC 00:00:00:00:00:00 omit the MAC address
-COPY 2.3_mac_address.patch /tmp/2.3_mac_address.patch
+COPY 2.6_mac_address.patch /tmp/2.6_mac_address.patch
 # sh8121att: patch so query for RPC info contains proper Host header
-copy 2.3_hostheader.patch /tmp/2.3_hostheader.patch
+##copy 2.3_hostheader.patch /tmp/2.3_hostheader.patch
 
-RUN cd /usr/lib/python3/dist-packages/provisioningserver/utils && patch network.py < /tmp/2.3_nic_filter.patch
-RUN cd /usr/lib/python3/dist-packages/provisioningserver/utils && patch ipaddr.py < /tmp/2.3_mac_address.patch
-RUN cd /usr/lib/python3/dist-packages/provisioningserver/rpc && patch clusterservice.py < /tmp/2.3_hostheader.patch
+# that's fixed ?
+#RUN cd /usr/lib/python3/dist-packages/provisioningserver/utils && patch network.py < /tmp/2.3_nic_filter.patch
+RUN cd /usr/lib/python3/dist-packages/provisioningserver/utils && patch ipaddr.py < /tmp/2.6_mac_address.patch
+# that's fixed ?
+#RUN cd /usr/lib/python3/dist-packages/provisioningserver/rpc && patch clusterservice.py < /tmp/2.3_hostheader.patch
 
 # echo journalctl logs to the container's stdout
 COPY scripts/journalctl-to-tty.service /etc/systemd/system/journalctl-to-tty.service
